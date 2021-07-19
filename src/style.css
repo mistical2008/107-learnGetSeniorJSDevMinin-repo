@@ -1,0 +1,6 @@
+@import "./module.css";
+$red: #f00;
+
+body {
+  background-color: $red;
+}
