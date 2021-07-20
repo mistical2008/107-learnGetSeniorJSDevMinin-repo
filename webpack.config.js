@@ -1,33 +1,50 @@
-const path = require("path");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const { ESBuildMinifyPlugin } = require("esbuild-loader");
-const DevServer = require("webpack-dev-server");
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { ESBuildMinifyPlugin } = require('esbuild-loader');
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = !isProduction;
 
 const filename = (ext) =>
   isDevelopment ? `bundle.${ext}` : `bundle.[chunkhash].${ext}`;
 
+const jsLoaders = () => {
+  const loaders = [
+    {
+      loader: 'esbuild-loader',
+      options: {
+        loader: 'ts',
+        target: 'es2015',
+      },
+    },
+  ];
+
+  if (isDevelopment) {
+    loaders.push({ loader: 'eslint-loader' });
+  }
+
+  return loaders;
+};
+
 module.exports = {
-  context: path.resolve(__dirname, "src"),
-  mode: "development",
-  entry: "./index.ts",
+  context: path.resolve(__dirname, 'src'),
+  mode: 'development',
+  entry: './index.ts',
   output: {
-    filename: filename("js"),
-    path: path.resolve(__dirname, "dist"),
+    filename: filename('js'),
+    path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
-    extensions: [".ts", ".js"],
+    extensions: ['.ts', '.js'],
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      "@core": path.resolve(__dirname, "src/core"),
+      '@': path.resolve(__dirname, 'src'),
+      '@core': path.resolve(__dirname, 'src/core'),
     },
   },
-  devtool: isDevelopment ? "eval" : false,
+  devtool: isDevelopment ? 'eval' : false,
   devServer: {
     port: process.env.PORT || 3000,
     hot: isDevelopment,
@@ -35,7 +52,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: "index.html",
+      template: 'index.html',
       minify: {
         removeComments: isProduction,
         collapseWhitespace: isProduction,
@@ -44,13 +61,13 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, "src/favicon.ico"),
-          to: path.resolve(__dirname, "dist"),
+          from: path.resolve(__dirname, 'src/favicon.ico'),
+          to: path.resolve(__dirname, 'dist'),
         },
       ],
     }),
     new MiniCssExtractPlugin({
-      filename: filename("css"),
+      filename: filename('css'),
     }),
   ],
   module: {
@@ -60,29 +77,25 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: "style-loader",
+            loader: 'style-loader',
           },
           {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: {
               importLoaders: 1,
             },
           },
           {
-            loader: "postcss-loader",
+            loader: 'postcss-loader',
             options: {
-              postcssOptions: require("./postcss.config.js"),
+              postcssOptions: require('./postcss.config.js'),
             },
           },
         ],
       },
       {
         test: /\.[jt]s?$/,
-        loader: "esbuild-loader",
-        options: {
-          loader: "ts",
-          target: "es2015",
-        },
+        use: jsLoaders(),
       },
     ],
   },
