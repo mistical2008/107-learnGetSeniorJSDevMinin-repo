@@ -1,6 +1,4 @@
 {
-  "extends": ["eslint:recommended", "google"],
-  "rules": {
   "parser": "@typescript-eslint/parser",
   "env": {
     "es6": true,

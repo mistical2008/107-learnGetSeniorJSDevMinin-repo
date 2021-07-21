@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node_modules/.bin/cross-env NODE_ENV=development node_modules/.bin/webpack serve",
+    "dev": "npx nodemon --watch webpack.*.js --exec \"npm start\"",
     "build": "node_modules/.bin/cross-env NODE_ENV=production node_modules/.bin/webpack --mode production"
   },
   "keywords": [],
@@ -37,7 +38,7 @@
     "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2"
   },
-  "browserlist": [
+  "browserslist": [
     "last 1 version",
     "> 1%",
     "IE 10"

@@ -10,7 +10,7 @@ console.log('Workinggg!');
 // console.log(...arr);
 
 start();
-document.querySelector('#app').innerHTML = 'hello';
+document.querySelector('#app').innerHTML = 'HELLO';
 
 if (module.hot) {
   module.hot.accept();
