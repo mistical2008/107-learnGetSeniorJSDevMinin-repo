@@ -1,11 +1,12 @@
-const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { ESBuildMinifyPlugin } = require('esbuild-loader');
+const path = require("path");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlWebpackHarddiskPlugin = require("html-webpack-harddisk-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { ESBuildMinifyPlugin } = require("esbuild-loader");
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === "production";
 const isDevelopment = !isProduction;
 
 const filename = (ext) =>
@@ -14,45 +15,49 @@ const filename = (ext) =>
 const jsLoaders = () => {
   const loaders = [
     {
-      loader: 'esbuild-loader',
+      loader: "esbuild-loader",
       options: {
-        loader: 'ts',
-        target: 'es2015',
+        loader: "ts",
+        target: "es2015",
       },
     },
   ];
 
   if (isDevelopment) {
-    loaders.push({ loader: 'eslint-loader' });
+    loaders.push({ loader: "eslint-loader" });
   }
 
   return loaders;
 };
 
 module.exports = {
-  context: path.resolve(__dirname, 'src'),
-  mode: 'development',
-  entry: './index.ts',
+  context: path.resolve(__dirname, "src"),
+  mode: "development",
+  target: isDevelopment ? "web" : ["es5", "web"],
+  entry: "./index.ts",
   output: {
-    filename: filename('js'),
-    path: path.resolve(__dirname, 'dist'),
+    filename: filename("js"),
+    path: path.resolve(__dirname, "dist"),
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: [".ts", ".js"],
     alias: {
-      '@': path.resolve(__dirname, 'src'),
-      '@core': path.resolve(__dirname, 'src/core'),
+      "@": path.resolve(__dirname, "src"),
+      "@core": path.resolve(__dirname, "src/core"),
     },
   },
-  devtool: isDevelopment ? 'eval' : false,
+  // devtool: isDevelopment ? 'source-map' : false,
   devServer: {
-    port: process.env.PORT || 3000,
-    hot: isDevelopment,
+    contentBase: path.join(__dirname, "dist"),
+    writeToDisk: true,
+    index: "index.html",
+    port: 9000,
+    hot: true,
   },
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: 'index.html',
+      template: "index.html",
       minify: {
         removeComments: isProduction,
         collapseWhitespace: isProduction,
@@ -61,13 +66,22 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'src/favicon.ico'),
-          to: path.resolve(__dirname, 'dist'),
+          from: path.resolve(__dirname, "src/favicon.ico"),
+          to: path.resolve(__dirname, "dist"),
         },
       ],
     }),
+    new HtmlWebpackPlugin({
+      template: "index.html",
+      minify: {
+        removeComments: isProduction,
+        collapseWhitespace: isProduction,
+      },
+      alwaysWriteToDisk: true,
+    }),
+    new HtmlWebpackHarddiskPlugin(),
     new MiniCssExtractPlugin({
-      filename: filename('css'),
+      filename: filename("css"),
     }),
   ],
   module: {
@@ -77,18 +91,18 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: 'style-loader',
+            loader: MiniCssExtractPlugin.loader,
           },
           {
-            loader: 'css-loader',
+            loader: "css-loader",
             options: {
               importLoaders: 1,
             },
           },
           {
-            loader: 'postcss-loader',
+            loader: "postcss-loader",
             options: {
-              postcssOptions: require('./postcss.config.js'),
+              postcssOptions: require("./postcss.config.js"),
             },
           },
         ],
@@ -96,6 +110,7 @@ module.exports = {
       {
         test: /\.[jt]s?$/,
         use: jsLoaders(),
+        exclude: "/node_modules/",
       },
     ],
   },

@@ -1,5 +1,20 @@
 {
   "extends": ["eslint:recommended", "google"],
   "rules": {
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  },
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended", 
+    "google"
+  ],
+  "rules": {
+    "require-jsdoc":"off",
+    "no-unused-vars":"warn"
   }
 }

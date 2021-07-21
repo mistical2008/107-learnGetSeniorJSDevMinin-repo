@@ -1,1 +1,1 @@
-console.log("Module works!");
+console.log('Module works!');
